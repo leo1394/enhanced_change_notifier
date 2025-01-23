@@ -1,9 +1,9 @@
+publish_to: https://pub.dev/
 name: enhanced_change_notifier
-description: A enhanced version of ChangeNotifier with target, once, and immediate support.
+description: A enhanced version of ChangeNotifier introduces new features `target`, `once`, and `immediate`.
 homepage: https://github.com/leo1394/enhanced_change_notifier
 repository: https://github.com/leo1394/enhanced_change_notifier
 version: 0.1.0
-
 environment:
   sdk: '>=3.0.0 <4.0.0'
 
