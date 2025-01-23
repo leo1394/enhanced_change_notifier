@@ -50,7 +50,7 @@ class EnhancedChangeNotifier extends ChangeNotifier {
       for(var listener in _onceListeners[targetKey] ?? []) {
         try{
           if(targetKey != 'All') {
-            listener(targetKey);
+            listener is PropertyCallback ? listener(targetKey) : listener();
           }else {
             listener();
           }
@@ -66,7 +66,7 @@ class EnhancedChangeNotifier extends ChangeNotifier {
       _elementListeners[target]?.forEach((listener) {
         try{
           if(targetKey != 'All') {
-            listener(targetKey);
+            listener is PropertyCallback ? listener(targetKey) : listener();
           }else {
             listener();
           }
