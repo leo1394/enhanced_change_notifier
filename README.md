@@ -15,9 +15,9 @@ Support for targeted notifications on object property changes.
 
 Enhanced ChangeNotifiers introduce three new features in addition to all existing ChangeNotifier capabilities in Flutter Core:
 
-target: notifies listeners at the moment a specified property changes. 
-once: notifies listeners only once at the moment of a change.
-immediate: allows notifications to be sent immediately after a listener is registered and upon subsequent changes.
+- target: notifies listeners at the moment a specified property changes.
+- once: notifies listeners only once at the moment of a change.
+- immediate: allows notifications to be sent immediately after a listener is registered and upon subsequent changes.
 
 ## Getting started
 published on pub.dev, run this Flutter command
@@ -30,7 +30,7 @@ import 'package:enhanced_change_notifier/enhanced_change_notifier.dart';
 
 class AppModel extends EnhancedChangeNotifier {
   String? _token;
-  
+
   String? get token => _token;
   set token(String? token) {
     _token = token;
