@@ -1,0 +1,21 @@
+name: enhanced_change_notifier
+description: A enhanced version of ChangeNotifier with target, once, and immediate support.
+homepage: https://github.com/angulardart-community/change_notifier
+version: 0.1.0
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.24.0
