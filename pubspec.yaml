@@ -1,6 +1,7 @@
 name: enhanced_change_notifier
 description: A enhanced version of ChangeNotifier with target, once, and immediate support.
-homepage: https://github.com/angulardart-community/change_notifier
+homepage: https://github.com/leo1394/enhanced_change_notifier
+repository: https://github.com/leo1394/enhanced_change_notifier
 version: 0.1.0
 
 environment:

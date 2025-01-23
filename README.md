@@ -11,52 +11,58 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages). 
 -->
 
-Support for detecting and being notified when an object is mutated.
+Support for targeted notifications on object property changes.
 
-There are two kinds of change notifiers:
+Enhanced ChangeNotifiers introduce three new features in addition to all existing ChangeNotifier capabilities in Flutter Core:
 
-AsyncChangeNotifier: be notified of a continuous stream of events over time.
-ChangeNotifier: be notified at the moment of a change. This is a direct extraction of ChangeNotifier in Flutter Core.
-Some suggested uses for this library:
-
-Observe objects for changes, and log when a change occurs
-Optimize for observable collections in your own APIs and libraries instead of diffing
-Implement simple data-binding by listening to streams
-Usage
-There are two general ways to detect changes:
-
-Listen to ChangeNotifier.changes and be notified when an object changes
-Use Differ.diff to determine changes between two objects
-
-## enhanced_change_notifier
-
-```dart
-const like = 'sample';
-```
-
-## global_factory
-
-would create a global singleton instance of AppModel Class
-```dart
-final GlobalFactory<AppModel> appStateModel = GlobalFactory(() => AppModel());
-```
+target: notifies listeners at the moment a specified property changes. 
+once: notifies listeners only once at the moment of a change.
+immediate: allows notifications to be sent immediately after a listener is registered and upon subsequent changes.
 
 ## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
-
+published on pub.dev, run this Flutter command
+```shell
+flutter pub add enhanced_change_notifier
+```
+## Usage in Dart
 ```dart
-const like = 'sample';
+import 'package:enhanced_change_notifier/enhanced_change_notifier.dart';
+
+class AppModel extends EnhancedChangeNotifier {
+  String? _token;
+  
+  String? get token => _token;
+  set token(String? token) {
+    _token = token;
+    notifyListeners("token");
+  }
+}
+
+// GlobalFactory helps create a global singleton instance.
+final GlobalFactory<AppModel> appStateModel = GlobalFactory(() => AppModel());
+
+function _e_anyChangedListener() {
+  print("any property is changed");
+}
+
+function _e_tokenChangedListener(String property) {
+  print("$property is changed");
+}
+
+function _e_onceListener(String property) {
+  print("$property is changed, will notify only once.");
+}
+
+function _e_immediateListener(String property) {
+  print("$property is changed, will send immediately after listener is registered.");
+}
+
+appStateModel.getInstance().addListener(_e_anyChangedListener);
+appStateModel.getInstance().addListener(_e_tokenChangedListener, target: 'token');
+appStateModel.getInstance().addListener(_e_onceListener, target: 'token', once: true);
+appStateModel.getInstance().addListener(_e_immediateListener, target: 'token', immediate: true);
+
 ```
 
 ## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+Feel free to file an issue if you have any problem.
