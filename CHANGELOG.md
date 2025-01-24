@@ -1,3 +1,6 @@
+## 0.1.2
+- tiny code optimization 
+
 ## 0.1.1
 - Bug fixed #1: `target` listener supports VoidCallback and PropertyCallback
 

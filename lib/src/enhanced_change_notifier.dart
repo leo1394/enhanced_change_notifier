@@ -124,7 +124,7 @@ class EnhancedChangeNotifier extends ChangeNotifier {
         print("Warning: target can not be empty String!");
       }
       target = target.where((element) => element.isNotEmpty && element != "All").toList();
-    } else if (target == null){
+    } else {
       target = [null];
     }
     List<String?> targets = (target as List).cast<String?>().toList();
