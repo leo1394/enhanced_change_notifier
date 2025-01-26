@@ -19,11 +19,13 @@ void _e_appStateAnyChangedListener() {
 
 void main() {
   group('A group of tests', () {
-    final GlobalFactory<AppModel> appStateModel = GlobalFactory(() => AppModel());
+    final GlobalFactory<AppModel> appStateModel =
+        GlobalFactory(() => AppModel());
     appStateModel.getInstance().addListener(_e_appStateAnyChangedListener);
 
     setUp(() {
-      appStateModel.getInstance().token = "fe3f6b58-684e-4063-ba3b-1b8f14981a8e";
+      appStateModel.getInstance().token =
+          "fe3f6b58-684e-4063-ba3b-1b8f14981a8e";
     });
 
     test('listener triggered', () {

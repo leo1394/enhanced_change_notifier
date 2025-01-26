@@ -28,9 +28,13 @@ void main() {
   final GlobalFactory<AppModel> appStateModel = GlobalFactory(() => AppModel());
   // add different types of listeners, support target, once, immediate
   appStateModel.getInstance().addListener(_e_appStateAnyChangedListener);
-  appStateModel.getInstance().addListener(_e_appStateTokenChangedListener, target: 'token');
-  appStateModel.getInstance().addListener(_e_appStateBaseUrlChangedOnceListener, target: 'baseUrl', once: true);
-  appStateModel.getInstance().addListener(_e_appStateTasksChangedListener, target: 'tasks', immediate: true);
+  appStateModel
+      .getInstance()
+      .addListener(_e_appStateTokenChangedListener, target: 'token');
+  appStateModel.getInstance().addListener(_e_appStateBaseUrlChangedOnceListener,
+      target: 'baseUrl', once: true);
+  appStateModel.getInstance().addListener(_e_appStateTasksChangedListener,
+      target: 'tasks', immediate: true);
 
   // assignment would trigger listeners
   appStateModel.getInstance().token = "fe3f6b58-684e-4063-ba3b-1b8f14981a8e";
@@ -47,7 +51,8 @@ void _e_appStateTokenChangedListener(String property) {
 }
 
 void _e_appStateTasksChangedListener(String property) {
-  print('$property changed in AppModel, listener would be triggered immediately right after setup ');
+  print(
+      '$property changed in AppModel, listener would be triggered immediately right after setup ');
 }
 
 void _e_appStateBaseUrlChangedOnceListener(String property) {
