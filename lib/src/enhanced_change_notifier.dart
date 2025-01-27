@@ -1,17 +1,20 @@
 // Copyright (c) 2025, the Dart project authors. Use of this source code
-// is governed by a BSD-style license that can be found in the LICENSE file.
+// is governed by a MIT license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
 
 typedef PropertyCallback = void Function(String property);
 typedef VoidCallback = void Function();
 
+/// A class that can be extended in that provides a change notification
+/// API using [VoidCallback] or [PropertyCallback] for notifications of specified or all properties.
 class EnhancedChangeNotifier extends ChangeNotifier {
   // Custom listener mechanism
   final Map<String, List<Function>> _elementListeners = {};
   final Map<String, List<Function>> _onceListeners = {};
 
-  // Register a listener for a specific element
+  /// Register a listener for a specific property
+  /// target can be an element or elements list like &#91; property1, property2 &#93;
   @override
   void addListener(Function listener,
       {Object? target, bool once = false, bool immediate = false}) {
@@ -48,7 +51,7 @@ class EnhancedChangeNotifier extends ChangeNotifier {
       }
 
       if (immediate == true) {
-        this.notifyListeners(property);
+        notifyListeners(property);
       }
     }
   }
@@ -93,7 +96,7 @@ class EnhancedChangeNotifier extends ChangeNotifier {
     }
   }
 
-  // Remove a listener
+  /// Remove a listener
   @override
   void removeListener(Function listener) {
     for (var elementName in _elementListeners.keys) {

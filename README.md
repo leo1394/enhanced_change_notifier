@@ -1,15 +1,7 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages). 
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages). 
--->
+## enhanced_change_notifier
+[![pub package](https://img.shields.io/pub/v/enhanced_change_notifier.svg)](https://pub.dev/packages/enhanced_change_notifier)
+[![pub points](https://img.shields.io/pub/points/enhanced_change_notifier?color=2E8B57&label=pub%20points)](https://pub.dev/packages/enhanced_change_notifier/score)
 
 Support for targeted notifications on object property changes.
 
@@ -18,6 +10,17 @@ Enhanced ChangeNotifiers introduce three new features in addition to all existin
 - target: notifies listeners at the moment a specified property changes.
 - once: notifies listeners only once at the moment of a change.
 - immediate: allows notifications to be sent immediately after a listener is registered and upon subsequent changes.
+
+## Platform Support
+
+| Android | iOS | MacOS | Web | Linux | Windows |
+| :-----: | :-: | :---: | :-: | :---: | :-----: |
+|   ✅    | ✅  |  ✅   | ✅  |  ✅   |   ✅    |
+
+## Requirements
+
+- Flutter >=3.0.0 <4.0.0
+- Dart >=2.17.0 
 
 ## Getting started
 published on pub.dev, run this Flutter command
