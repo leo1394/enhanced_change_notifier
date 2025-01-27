@@ -2,6 +2,10 @@
 ## enhanced_change_notifier
 [![pub package](https://img.shields.io/pub/v/enhanced_change_notifier.svg)](https://pub.dev/packages/enhanced_change_notifier)
 [![pub points](https://img.shields.io/pub/points/enhanced_change_notifier?color=2E8B57&label=pub%20points)](https://pub.dev/packages/enhanced_change_notifier/score)
+[![GitHub Issues](https://img.shields.io/github/issues/leo1394/enhanced_change_notifier.svg?branch=master)](https://github.com/leo1394/enhanced_change_notifier/issues)
+[![GitHub Forks](https://img.shields.io/github/forks/leo1394/enhanced_change_notifier.svg?branch=master)](https://github.com/leo1394/enhanced_change_notifier/network)
+[![GitHub Stars](https://img.shields.io/github/stars/leo1394/enhanced_change_notifier.svg?branch=master)](https://github.com/leo1394/enhanced_change_notifier/stargazers)
+[![GitHub License](https://img.shields.io/badge/license-MIT%20-blue.svg)](https://raw.githubusercontent.com/leo1394/enhanced_change_notifier/master/LICENSE)
 
 Support for targeted notifications on object property changes.
 
