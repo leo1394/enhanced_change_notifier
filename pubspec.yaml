@@ -3,7 +3,7 @@ description: A enhanced version of ChangeNotifier introduces new features `targe
 homepage: https://github.com/leo1394/enhanced_change_notifier
 repository: https://github.com/leo1394/enhanced_change_notifier
 issue_tracker: https://github.com/leo1394/enhanced_change_notifier/issues
-version: 0.1.5
+version: 0.1.6
 environment:
   sdk: '>=3.0.0 <4.0.0'
 
@@ -14,3 +14,9 @@ dependencies:
 dev_dependencies:
   lints: ^5.0.0
   test: ^1.24.0
+
+topics:
+  - change-notifier
+  - property-notifier
+  - once
+  - immediate

@@ -1,3 +1,6 @@
+## 0.1.6
+- README tuned
+
 ## 0.1.5
 - tiny code optimization
 
