@@ -32,6 +32,8 @@ published on pub.dev, run this Flutter command
 flutter pub add enhanced_change_notifier
 ```
 ## Usage in Dart
+
+Multiple properties or Mutable data types, extending [EnhancedChangeNotifier] directly to meet flexible requirements like cache or targeted listener.
 ```dart
 import 'package:enhanced_change_notifier/enhanced_change_notifier.dart';
 
@@ -68,6 +70,26 @@ appStateModel.getInstance().addListener(_e_anyChangedListener);
 appStateModel.getInstance().addListener(_e_tokenChangedListener, target: 'token');
 appStateModel.getInstance().addListener(_e_onceListener, target: 'token', once: true);
 appStateModel.getInstance().addListener(_e_immediateListener, target: 'token', immediate: true);
+
+```
+
+A single implementation buffers pipelined listener pending a release signal.
+```dart
+
+import 'package:enhanced_change_notifier/signal.dart';
+
+Signal isConsumerReady = Signal();
+isConsumerReady.value = false;
+
+// delayed signal release
+Future.delayed(Duration(milliseconds: 300), () {
+isConsumerReady.value = true;
+});
+
+// register listener consumed immediately or awaited once via Signal(True).
+isConsumerReady.promise(() => print("Task 1 executed"));
+isConsumerReady.promise(() => print("Task 2 executed"));
+isConsumerReady.promise(() => print("Task 3 executed"));
 
 ```
 

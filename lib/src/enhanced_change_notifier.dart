@@ -56,7 +56,7 @@ class EnhancedChangeNotifier extends ChangeNotifier {
     }
   }
 
-  // Notify listeners for a specific element
+  /// Notify listeners for a specific element
   @override
   void notifyListeners([String? target]) {
     print("notify Listeners for ${target ?? 'All'} ...");
