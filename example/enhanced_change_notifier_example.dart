@@ -2,25 +2,21 @@ import 'package:enhanced_change_notifier/enhanced_change_notifier.dart';
 import 'package:enhanced_change_notifier/signal.dart';
 
 class AppModel extends EnhancedChangeNotifier {
-  Map<String, dynamic> _tasks = {};
-  String? _token;
-  String? _baseUrl;
-
-  String? get token => _token;
+  String? get token => super.properties["token"];
   set token(String? token) {
-    _token = token;
+    super.properties["token"] = token;
     notifyListeners("token");
   }
 
-  String? get baseUrl => _baseUrl;
+  String? get baseUrl => super.properties["baseUrl"];
   set baseUrl(String? baseUrl) {
-    _baseUrl = baseUrl;
+    super.properties["baseUrl"] = baseUrl;
     notifyListeners("baseUrl");
   }
 
-  Map<String, dynamic> get tasks => _tasks;
+  Map<String, dynamic> get tasks => super.properties["tasks"];
   set tasks(Map<String, dynamic> tasks) {
-    _tasks = tasks;
+    super.properties["tasks"] = tasks;
     notifyListeners("tasks");
   }
 }
@@ -34,6 +30,8 @@ void main() {
   appStateModel
       .getInstance()
       .addListener(_e_appStateTokenChangedListener, target: 'token');
+  appStateModel.getInstance().addListener(_e_appStateSomeChangedListener,
+      target: ['token', 'baseUrl', 'tasks']);
   appStateModel.getInstance().addListener(_e_appStateBaseUrlChangedOnceListener,
       target: 'baseUrl', once: true);
   appStateModel.getInstance().addListener(_e_appStateTasksChangedListener,
@@ -61,13 +59,17 @@ void _e_appStateAnyChangedListener() {
   print('any property changed in AppModel');
 }
 
-void _e_appStateTokenChangedListener(String property) {
+void _e_appStateSomeChangedListener(String property) {
   print('$property changed in AppModel');
 }
 
-void _e_appStateTasksChangedListener(String property) {
+void _e_appStateTokenChangedListener(String property, Object? value) {
+  print('$property changed to $value in AppModel');
+}
+
+void _e_appStateTasksChangedListener(String property, Object? value) {
   print(
-      '$property changed in AppModel, listener would be triggered immediately right after setup ');
+      '$property changed to $value in AppModel, listener would be triggered immediately right after setup ');
 }
 
 void _e_appStateBaseUrlChangedOnceListener(String property) {

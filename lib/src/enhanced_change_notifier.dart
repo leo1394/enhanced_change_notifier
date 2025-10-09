@@ -4,26 +4,58 @@
 import 'package:flutter/material.dart';
 
 typedef PropertyCallback = void Function(String property);
+typedef PropertyValueCallback = void Function(String property, Object? value);
 typedef VoidCallback = void Function();
 
 /// A class that can be extended in that provides a change notification
-/// API using [VoidCallback] or [PropertyCallback] for notifications of specified or all properties.
+/// API using [VoidCallback] or [PropertyCallback] or [PropertyValueCallback] for notifications of specified or all properties.
 class EnhancedChangeNotifier extends ChangeNotifier {
-  // Custom listener mechanism
+  /// Define a map to hold all property values.
+  /// It's protected so only this class and subclasses can access it directly.
+  @protected
+  final Map<String, dynamic> properties = {};
+
+  /// Custom listener mechanism
   final Map<String, List<Function>> _elementListeners = {};
   final Map<String, List<Function>> _onceListeners = {};
+
+  /// Implement getProperty to return the value of a property by its name.
+  @protected
+  Object? getProperty(String propertyName) {
+    return properties[propertyName];
+  }
+
+  /// Initialize `properties` with map
+  @protected
+  void fromMap(Map<String, dynamic> props) {
+    for (var propertyName in props.keys.toList()) {
+      properties[propertyName] = props[propertyName];
+    }
+  }
+
+  /// Override hasListeners to check if there are any listeners.
+  @override
+  bool get hasListeners =>
+      super.hasListeners ||
+      _elementListeners.isNotEmpty ||
+      _onceListeners.isNotEmpty;
 
   /// Register a listener for a specific property
   /// target can be an element or elements list like &#91; property1, property2 &#93;
   @override
   void addListener(Function listener,
       {Object? target, bool once = false, bool immediate = false}) {
-    assert(listener is VoidCallback || listener is PropertyCallback,
-        "Listener must be a Function() or Function(String)");
+    assert(
+        listener is VoidCallback ||
+            listener is PropertyCallback ||
+            listener is PropertyValueCallback,
+        "Listener must be a Function(), Function(String), or Function(String, Object?)");
     assert(target == null || target is String || target is List<String>,
         "Target must be String or List<String>");
     assert(target != null || listener is! PropertyCallback,
         "Subscribe all properties change event, listener can not be Function(String)");
+    assert(target != null || listener is! PropertyValueCallback,
+        "Subscribe all properties change event, listener can not be Function(String, Object?)");
 
     List<String?>? targets = _validate(target);
     if (targets == null || targets.isEmpty) {
@@ -69,7 +101,14 @@ class EnhancedChangeNotifier extends ChangeNotifier {
       for (var listener in _onceListeners[targetKey] ?? []) {
         try {
           if (targetKey != 'All') {
-            listener is PropertyCallback ? listener(targetKey) : listener();
+            if (listener is PropertyValueCallback) {
+              final value = getProperty(targetKey);
+              listener(targetKey, value);
+            } else if (listener is PropertyCallback) {
+              listener(targetKey);
+            } else {
+              listener();
+            }
           } else {
             listener();
           }
@@ -85,7 +124,14 @@ class EnhancedChangeNotifier extends ChangeNotifier {
       _elementListeners[target]?.forEach((listener) {
         try {
           if (targetKey != 'All') {
-            listener is PropertyCallback ? listener(targetKey) : listener();
+            if (listener is PropertyValueCallback) {
+              final value = getProperty(targetKey);
+              listener(targetKey, value);
+            } else if (listener is PropertyCallback) {
+              listener(targetKey);
+            } else {
+              listener();
+            }
           } else {
             listener();
           }

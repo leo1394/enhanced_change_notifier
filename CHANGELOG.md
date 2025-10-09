@@ -1,6 +1,11 @@
+## 0.2.0
+- Feature #1: Introduce `PropertyValueCallback` listener.
+- Feature #2: Override `hasListners` of ChangeNotifier to check if there are any listeners.
+
 ## 0.1.7
 - Feature #1: Introduce `EnhancedValueNotifier` holds a single value.
 - Feature #2: Introduce `Signal` buffers pipelined listener pending a release signal.
+- Feature #3: Introduce `PropertyCallback` listener.
 
 ## 0.1.6
 - README tuned
