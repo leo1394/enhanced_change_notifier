@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 
 typedef PropertyCallback = void Function(String property);
 typedef PropertyValueCallback = void Function(String property, Object? value);
+typedef ValueCallback = void Function(Object? value);
 typedef VoidCallback = void Function();
 
 /// A class that can be extended in that provides a change notification
-/// API using [VoidCallback] or [PropertyCallback] or [PropertyValueCallback] for notifications of specified or all properties.
+/// API using [VoidCallback] or [PropertyCallback] or [ValueCallback] or [PropertyValueCallback] for notifications of specified or all properties.
 class EnhancedChangeNotifier extends ChangeNotifier {
   /// Define a map to hold all property values.
   /// It's protected so only this class and subclasses can access it directly.
@@ -104,6 +105,9 @@ class EnhancedChangeNotifier extends ChangeNotifier {
             if (listener is PropertyValueCallback) {
               final value = getProperty(targetKey);
               listener(targetKey, value);
+            } else if (listener is ValueCallback) {
+              final value = getProperty(targetKey);
+              listener(value);
             } else if (listener is PropertyCallback) {
               listener(targetKey);
             } else {
@@ -127,6 +131,9 @@ class EnhancedChangeNotifier extends ChangeNotifier {
             if (listener is PropertyValueCallback) {
               final value = getProperty(targetKey);
               listener(targetKey, value);
+            } else if (listener is ValueCallback) {
+              final value = getProperty(targetKey);
+              listener(value);
             } else if (listener is PropertyCallback) {
               listener(targetKey);
             } else {

@@ -1,5 +1,6 @@
 import 'package:enhanced_change_notifier/enhanced_change_notifier.dart';
 import 'package:enhanced_change_notifier/signal.dart';
+import 'package:enhanced_change_notifier/src/enhanced_latch_notifier.dart';
 
 class AppModel extends EnhancedChangeNotifier {
   String? get token => super.properties["token"];
@@ -21,9 +22,28 @@ class AppModel extends EnhancedChangeNotifier {
   }
 }
 
+class TaskPictureStateEvent {
+  String actionId;
+  TaskPictureStateEvent(this.actionId);
+}
+
+class TaskPictureChangeLatch
+    extends EnhancedLatchNotifier<TaskPictureStateEvent> {}
+
 void main() {
   final GlobalFactory<AppModel> appStateModel = GlobalFactory(() => AppModel());
+  final GlobalFactory<TaskPictureChangeLatch> taskIRChangeLatch =
+      GlobalFactory(() => TaskPictureChangeLatch());
   Signal isConsumerReady = Signal();
+
+  taskIRChangeLatch.getInstance().addListener((event) {
+    if (event.actionId == "test") {
+      print("triggered ==> ${event.actionId}");
+    }
+  });
+
+  taskIRChangeLatch.getInstance().fire(TaskPictureStateEvent("safasf"));
+  taskIRChangeLatch.getInstance().unlatch();
 
   // add different types of listeners, support target, once, immediate
   appStateModel.getInstance().addListener(_e_appStateAnyChangedListener);

@@ -1,3 +1,7 @@
+## 0.2.1
+- Feature #1: Introduce `EnhancedLatchNotifier` listener.
+- Feature #2: Introduce `ValueCallback` listener.
+
 ## 0.2.0
 - Feature #1: Introduce `PropertyValueCallback` listener.
 - Feature #2: Override `hasListners` of ChangeNotifier to check if there are any listeners.
