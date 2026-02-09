@@ -1,3 +1,6 @@
+## 1.0.0
+- Automatically notify listeners when `super.properties[key] = value`
+
 ## 0.2.1
 - Feature #1: Introduce `EnhancedLatchNotifier` listener.
 - Feature #2: Introduce `ValueCallback` listener.

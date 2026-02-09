@@ -14,16 +14,32 @@ class EnhancedChangeNotifier extends ChangeNotifier {
   /// Define a map to hold all property values.
   /// It's protected so only this class and subclasses can access it directly.
   @protected
-  final Map<String, dynamic> properties = {};
+  final Map<String, dynamic> _properties = {};
 
   /// Custom listener mechanism
-  final Map<String, List<Function>> _elementListeners = {};
+  final Map<String, List<Function>> _propertyListeners = {};
   final Map<String, List<Function>> _onceListeners = {};
 
   /// Implement getProperty to return the value of a property by its name.
   @protected
-  Object? getProperty(String propertyName) {
-    return properties[propertyName];
+  Map<String, dynamic> get properties => Map.unmodifiable(_properties);
+
+  @protected
+  dynamic operator [](String target) => _properties[target];
+
+  @protected
+  void operator []=(String target, dynamic value) {
+    if (_properties[target] == value) return;
+    _properties[target] = value;
+    notifyListeners(target);
+  }
+
+  @protected
+  void clear(String target, {dynamic fallback, bool silent = true}) {
+    _properties[target] = fallback;
+    if (!silent) {
+      notifyListeners(target);
+    }
   }
 
   /// Initialize `properties` with map
@@ -34,11 +50,31 @@ class EnhancedChangeNotifier extends ChangeNotifier {
     }
   }
 
+  /// Override dispose to discards any resources used by the object. After
+  /// this is called, the object is not in a usable state and should be discarded
+  /// (calls to [addListener] will throw after the object is disposed).
+  ///
+  /// This method should only be called by the object's owner.
+  ///
+  /// This method does not notify listeners, and clears the listener list once
+  /// it is called. Consumers of this class must decide on whether to notify
+  /// listeners or not immediately before disposal.
+  @override
+  void dispose() {
+    super.dispose();
+    // remove all property listener
+    _propertyListeners.clear();
+    // remove all once property listener
+    _onceListeners.clear();
+    // remove all properties
+    _properties.clear();
+  }
+
   /// Override hasListeners to check if there are any listeners.
   @override
   bool get hasListeners =>
       super.hasListeners ||
-      _elementListeners.isNotEmpty ||
+      _propertyListeners.isNotEmpty ||
       _onceListeners.isNotEmpty;
 
   /// Register a listener for a specific property
@@ -71,16 +107,16 @@ class EnhancedChangeNotifier extends ChangeNotifier {
             ? null
             : _onceListeners[targetKey]!.add(listener);
       } else {
-        _elementListeners.putIfAbsent(targetKey, () => []);
+        _propertyListeners.putIfAbsent(targetKey, () => []);
         if (targetKey == "All" &&
-            !_elementListeners[targetKey]!.contains(listener)) {
+            !_propertyListeners[targetKey]!.contains(listener)) {
           if (listener is VoidCallback) {
             super.addListener(listener);
           }
         }
-        _elementListeners[targetKey]!.contains(listener)
+        _propertyListeners[targetKey]!.contains(listener)
             ? null
-            : _elementListeners[targetKey]!.add(listener);
+            : _propertyListeners[targetKey]!.add(listener);
       }
 
       if (immediate == true) {
@@ -103,10 +139,10 @@ class EnhancedChangeNotifier extends ChangeNotifier {
         try {
           if (targetKey != 'All') {
             if (listener is PropertyValueCallback) {
-              final value = getProperty(targetKey);
+              final value = properties[targetKey];
               listener(targetKey, value);
             } else if (listener is ValueCallback) {
-              final value = getProperty(targetKey);
+              final value = properties[targetKey];
               listener(value);
             } else if (listener is PropertyCallback) {
               listener(targetKey);
@@ -125,14 +161,14 @@ class EnhancedChangeNotifier extends ChangeNotifier {
     }
 
     if (target != null && target.isNotEmpty) {
-      _elementListeners[target]?.forEach((listener) {
+      _propertyListeners[target]?.forEach((listener) {
         try {
           if (targetKey != 'All') {
             if (listener is PropertyValueCallback) {
-              final value = getProperty(targetKey);
+              final value = properties[targetKey];
               listener(targetKey, value);
             } else if (listener is ValueCallback) {
-              final value = getProperty(targetKey);
+              final value = properties[targetKey];
               listener(value);
             } else if (listener is PropertyCallback) {
               listener(targetKey);
@@ -152,9 +188,9 @@ class EnhancedChangeNotifier extends ChangeNotifier {
   /// Remove a listener
   @override
   void removeListener(Function listener) {
-    for (var elementName in _elementListeners.keys) {
-      if (_elementListeners[elementName]!.contains(listener)) {
-        _elementListeners[elementName]!.remove(listener);
+    for (var elementName in _propertyListeners.keys) {
+      if (_propertyListeners[elementName]!.contains(listener)) {
+        _propertyListeners[elementName]!.remove(listener);
       }
     }
     for (var elementName in _onceListeners.keys) {

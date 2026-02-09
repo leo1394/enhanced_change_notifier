@@ -33,17 +33,15 @@ flutter pub add enhanced_change_notifier
 ```
 ## Usage in Dart
 
-Multiple properties or Mutable data types, extending [EnhancedChangeNotifier] directly to meet flexible requirements like cache or targeted listener.
+Multiple properties or Mutable data types, extending `EnhancedChangeNotifier` directly to meet flexible requirements like cache or targeted listener.
 ```dart
 import 'package:enhanced_change_notifier/enhanced_change_notifier.dart';
 
 class AppModel extends EnhancedChangeNotifier {
-  String? _token;
 
-  String? get token => _token;
+  String? get token => super.properties["token"];
   set token(String? token) {
-    _token = token;
-    notifyListeners("token");
+    super.properties["token"] = token;
   }
 }
 
@@ -54,26 +52,18 @@ function _e_anyChangedListener() {
   print("any property is changed");
 }
 
-function _e_tokenChangedListener(String property) {
-  print("$property is changed");
-}
+// Register all types of listeners
+appStateModel.getInstance().addListener(() => print("any property is changed"));
+appStateModel.getInstance().addListener((String property) => print("$property is changed"), target: 'token');
+appStateModel.getInstance().addListener((String property) => print("$property is changed, will notify only once."), target: 'token', once: true);
+appStateModel.getInstance().addListener((String property) => print("$property is changed, will send immediately after listener is registered."), target: 'token', immediate: true);
 
-function _e_onceListener(String property) {
-  print("$property is changed, will notify only once.");
-}
-
-function _e_immediateListener(String property) {
-  print("$property is changed, will send immediately after listener is registered.");
-}
-
-appStateModel.getInstance().addListener(_e_anyChangedListener);
-appStateModel.getInstance().addListener(_e_tokenChangedListener, target: 'token');
-appStateModel.getInstance().addListener(_e_onceListener, target: 'token', once: true);
-appStateModel.getInstance().addListener(_e_immediateListener, target: 'token', immediate: true);
+// Remove a specific listener
+appStateModel.getInstance().removeListener(_e_anyChangedListener);
 
 ```
 
-A single implementation buffers pipelined listener pending a release signal.
+`Signal` A single implementation buffers pipelined listener pending a release signal.
 ```dart
 
 import 'package:enhanced_change_notifier/signal.dart';
@@ -81,16 +71,30 @@ import 'package:enhanced_change_notifier/signal.dart';
 Signal isConsumerReady = Signal();
 isConsumerReady.value = false;
 
-// delayed signal release
-Future.delayed(Duration(milliseconds: 300), () {
-isConsumerReady.value = true;
-});
-
-// register listener consumed immediately or awaited once via Signal(True).
+// Register listener consumed immediately or awaited once via Signal(True).
 isConsumerReady.promise(() => print("Task 1 executed"));
 isConsumerReady.promise(() => print("Task 2 executed"));
-isConsumerReady.promise(() => print("Task 3 executed"));
 
+// Release delayed signal
+Future.delayed(Duration(milliseconds: 300), () => isConsumerReady.value = true);
+
+```
+
+
+`EnhancedLatchNotifier` supports complex data types for delayed notifications, unlike Signal which is limited to boolean values
+
+
+```dart
+final GlobalFactory<DelayedLatch> latchDemo = GlobalFactory(() => DelayedLatch());
+latchDemo.getInstance().addListener((event) {
+  if (event.actionId == "test") {
+    print("triggered ==> ${event.actionId}, ${event.value}");
+  }
+});
+// Fire latch and cache state event
+latchDemo.getInstance().fire(LatchStateEvent("test", 99));
+// Listener triggered when unlatch called
+Future.delayed(const Duration(seconds: 3), () => latchDemo.getInstance().unlatch());
 ```
 
 ## Additional information

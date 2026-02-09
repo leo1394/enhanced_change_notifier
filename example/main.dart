@@ -6,92 +6,79 @@ class AppModel extends EnhancedChangeNotifier {
   String? get token => super.properties["token"];
   set token(String? token) {
     super.properties["token"] = token;
-    notifyListeners("token");
   }
 
   String? get baseUrl => super.properties["baseUrl"];
   set baseUrl(String? baseUrl) {
     super.properties["baseUrl"] = baseUrl;
-    notifyListeners("baseUrl");
   }
 
   Map<String, dynamic> get tasks => super.properties["tasks"];
   set tasks(Map<String, dynamic> tasks) {
     super.properties["tasks"] = tasks;
-    notifyListeners("tasks");
   }
 }
 
-class TaskPictureStateEvent {
+class LatchStateEvent {
   String actionId;
-  TaskPictureStateEvent(this.actionId);
+  int value;
+  LatchStateEvent(this.actionId, this.value);
 }
 
-class TaskPictureChangeLatch
-    extends EnhancedLatchNotifier<TaskPictureStateEvent> {}
+class DelayedLatch extends EnhancedLatchNotifier<LatchStateEvent> {}
 
 void main() {
+  // 1. AppModel extends EnhancedChangeNotifier example
   final GlobalFactory<AppModel> appStateModel = GlobalFactory(() => AppModel());
-  final GlobalFactory<TaskPictureChangeLatch> taskIRChangeLatch =
-      GlobalFactory(() => TaskPictureChangeLatch());
-  Signal isConsumerReady = Signal();
-
-  taskIRChangeLatch.getInstance().addListener((event) {
-    if (event.actionId == "test") {
-      print("triggered ==> ${event.actionId}");
-    }
-  });
-
-  taskIRChangeLatch.getInstance().fire(TaskPictureStateEvent("safasf"));
-  taskIRChangeLatch.getInstance().unlatch();
-
-  // add different types of listeners, support target, once, immediate
-  appStateModel.getInstance().addListener(_e_appStateAnyChangedListener);
+  // Register different types of listeners, support target, once, immediate
   appStateModel
       .getInstance()
-      .addListener(_e_appStateTokenChangedListener, target: 'token');
-  appStateModel.getInstance().addListener(_e_appStateSomeChangedListener,
+      .addListener(() => print('any property changed in AppModel'));
+  appStateModel.getInstance().addListener(
+      (String property) => print('$property changed in AppModel'),
       target: ['token', 'baseUrl', 'tasks']);
-  appStateModel.getInstance().addListener(_e_appStateBaseUrlChangedOnceListener,
-      target: 'baseUrl', once: true);
-  appStateModel.getInstance().addListener(_e_appStateTasksChangedListener,
-      target: 'tasks', immediate: true);
+  appStateModel.getInstance().addListener(
+      (String property, Object? value) =>
+          print('$property changed to $value in AppModel'),
+      target: 'token');
+  appStateModel.getInstance().addListener(
+      (String property) => print(
+          '$property changed in AppModel, listener would be triggered only once'),
+      target: 'baseUrl',
+      once: true);
+  appStateModel.getInstance().addListener(
+      (String property, Object? value) => print(
+          '$property changed to $value in AppModel, listener would be triggered immediately right after setup '),
+      target: 'tasks',
+      immediate: true);
 
-  // assignment would trigger listeners
+  // Assignment would automatically trigger listeners
   appStateModel.getInstance().token = "fe3f6b58-684e-4063-ba3b-1b8f14981a8e";
   appStateModel.getInstance().baseUrl = "https://api.company.com";
   appStateModel.getInstance().tasks = {"task-for-example": 45};
 
+  // 2. Boolean Signal Use Example
+  Signal isConsumerReady = Signal();
   isConsumerReady.value = false;
 
-  // delayed signal release
-  Future.delayed(Duration(milliseconds: 300), () {
-    isConsumerReady.value = true;
-  });
-
-  // register listener consumed immediately or awaited once via Signal(True).
+  // Register listener consumed immediately or awaited once via Signal(True).
   isConsumerReady.promise(() => print("Task 1 executed"));
   isConsumerReady.promise(() => print("Task 2 executed"));
-  isConsumerReady.promise(() => print("Task 3 executed"));
-}
 
-void _e_appStateAnyChangedListener() {
-  print('any property changed in AppModel');
-}
+  // Release delayed signal
+  Future.delayed(Duration(seconds: 3), () => isConsumerReady.value = true);
 
-void _e_appStateSomeChangedListener(String property) {
-  print('$property changed in AppModel');
-}
-
-void _e_appStateTokenChangedListener(String property, Object? value) {
-  print('$property changed to $value in AppModel');
-}
-
-void _e_appStateTasksChangedListener(String property, Object? value) {
-  print(
-      '$property changed to $value in AppModel, listener would be triggered immediately right after setup ');
-}
-
-void _e_appStateBaseUrlChangedOnceListener(String property) {
-  print('$property changed in AppModel, listener would be triggered only once');
+  // 3. DelayedLatch extends EnhancedLatchNotifier example
+  final GlobalFactory<DelayedLatch> latchDemo =
+      GlobalFactory(() => DelayedLatch());
+  latchDemo.getInstance().addListener((event) {
+    if (event.actionId == "test") {
+      print("triggered ==> ${event.actionId}, ${event.value}");
+    }
+  });
+  // Fire latch and cache state event
+  latchDemo.getInstance().fire(LatchStateEvent("test", 99));
+  // Listener triggered when unlatch called
+  Future.delayed(
+      const Duration(seconds: 3), () => latchDemo.getInstance().unlatch());
 }
