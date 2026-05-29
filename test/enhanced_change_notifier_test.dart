@@ -1,35 +1,89 @@
 import 'package:enhanced_change_notifier/enhanced_change_notifier.dart';
+import 'package:enhanced_change_notifier/enhanced_latch_notifier.dart';
 import 'package:test/test.dart';
 
 class AppModel extends EnhancedChangeNotifier {
-  String? _token;
+  AppModel({String? token}) {
+    super.properties["token"] = token;
+  }
 
-  String? get token => _token;
+  String? get token => this["token"];
   set token(String? token) {
-    _token = token;
-    notifyListeners("token");
+    this["token"] = token;
   }
 }
 
-bool isChanged = false;
-void _e_appStateAnyChangedListener() {
-  print('any property changed in AppModel');
-  isChanged = true;
+class LatchStateEvent {
+  String actionId;
+  int value;
+  LatchStateEvent(this.actionId, this.value);
 }
 
-void main() {
-  group('A group of tests', () {
-    final GlobalFactory<AppModel> appStateModel =
-        GlobalFactory(() => AppModel());
-    appStateModel.getInstance().addListener(_e_appStateAnyChangedListener);
+class DelayedLatch extends EnhancedLatchNotifier<LatchStateEvent> {}
 
-    setUp(() {
-      appStateModel.getInstance().token =
-          "fe3f6b58-684e-4063-ba3b-1b8f14981a8e";
+void main() {
+  group('EnhancedChangeNotifier', () {
+    test('notifies all listeners when property setter uses notifying storage',
+        () {
+      final appModel = AppModel();
+      var changes = 0;
+
+      appModel.addListener(() {
+        changes++;
+      });
+
+      appModel.token = "fe3f6b58-684e-4063-ba3b-1b8f14981a8e";
+
+      expect(appModel.token, "fe3f6b58-684e-4063-ba3b-1b8f14981a8e");
+      expect(changes, 1);
     });
 
-    test('listener triggered', () {
-      expect(isChanged, isTrue);
+    test('notifies targeted listeners with property and value', () {
+      final appModel = AppModel();
+      String? changedProperty;
+      Object? changedValue;
+
+      appModel.addListener((String property, Object? value) {
+        changedProperty = property;
+        changedValue = value;
+      }, target: "token");
+
+      appModel.token = "target-token";
+
+      expect(changedProperty, "token");
+      expect(changedValue, "target-token");
+    });
+
+    test('properties setter stores values without notifying listeners', () {
+      final appModel = AppModel(token: "silent-token");
+      var changes = 0;
+
+      appModel.addListener(() {
+        changes++;
+      });
+
+      expect(appModel.token, "silent-token");
+      expect(changes, 0);
+    });
+  });
+
+  group('EnhancedLatchNotifier', () {
+    test('notifies listener when unlatched with cached value', () {
+      final latch = DelayedLatch();
+      LatchStateEvent? triggeredEvent;
+
+      latch.addListener((value) {
+        triggeredEvent = value;
+      });
+
+      latch.fire(LatchStateEvent("test", 99));
+
+      expect(triggeredEvent, isNull);
+
+      latch.unlatch();
+
+      expect(triggeredEvent?.actionId, "test");
+      expect(triggeredEvent?.value, 99);
     });
   });
 }

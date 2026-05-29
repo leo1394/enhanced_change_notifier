@@ -43,8 +43,7 @@ class EnhancedLatchNotifier<T> extends EnhancedValueNotifier<T?> {
   void fire(T value) {
     _cached = value;
     if (_latchOpened) {
-      super.properties[this._property] = value;
-      notifyListeners(this._property);
+      this[this._property] = value;
     }
   }
 
@@ -66,7 +65,7 @@ class EnhancedLatchNotifier<T> extends EnhancedValueNotifier<T?> {
     if (result == null) {
       throw StateError('Latch completed but no result was ever set!');
     }
-    super.properties[this._property] = _cached;
+    this[this._property] = result;
   }
 
   /// Resets the latch to its initial closed state, allowing it to be reused.
@@ -75,6 +74,6 @@ class EnhancedLatchNotifier<T> extends EnhancedValueNotifier<T?> {
   void reset() {
     _latchOpened = false;
     _cached = null; // clear previous result
-    super.clear(this._property, silent: true);
+    super.fromMap({this._property: null}); // reset property value
   }
 }

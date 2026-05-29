@@ -36,6 +36,8 @@ class EnhancedValueNotifier<T> extends EnhancedChangeNotifier
   @override
   T get value => _value;
   T _value;
+
+  /// Updates [value] and notifies listeners when the value changes.
   set value(T newValue) {
     if (_value == newValue) {
       return;
@@ -44,6 +46,7 @@ class EnhancedValueNotifier<T> extends EnhancedChangeNotifier
     notifyListeners();
   }
 
+  /// Returns a debug description containing this object's identity and value.
   @override
   String toString() => '${describeIdentity(this)}($value)';
 }

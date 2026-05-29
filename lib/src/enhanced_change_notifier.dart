@@ -1,11 +1,19 @@
 // Copyright (c) 2025, the Dart project authors. Use of this source code
 // is governed by a MIT license that can be found in the LICENSE file.
 
+import 'package:enhanced_change_notifier/src/chiming_properties.dart';
 import 'package:flutter/material.dart';
 
+/// A callback that receives the changed property name.
 typedef PropertyCallback = void Function(String property);
+
+/// A callback that receives the changed property name and current value.
 typedef PropertyValueCallback = void Function(String property, Object? value);
+
+/// A callback that receives the current value for the changed property.
 typedef ValueCallback = void Function(Object? value);
+
+/// A callback that receives no arguments.
 typedef VoidCallback = void Function();
 
 /// A class that can be extended in that provides a change notification
@@ -20,33 +28,30 @@ class EnhancedChangeNotifier extends ChangeNotifier {
   final Map<String, List<Function>> _propertyListeners = {};
   final Map<String, List<Function>> _onceListeners = {};
 
-  /// Implement getProperty to return the value of a property by its name.
+  /// A notifying map view for reading and writing property values by name.
+  ///
+  /// Assigning through this map, for example `properties["token"] = value`,
+  /// stores the value and notifies listeners for that property.
   @protected
-  Map<String, dynamic> get properties => Map.unmodifiable(_properties);
+  Map<String, dynamic> get properties =>
+      ChimingProperties(_properties, notifyListeners);
 
+  /// Returns the stored value for [target].
   @protected
   dynamic operator [](String target) => _properties[target];
 
+  /// Stores [value] for [target] and notifies listeners for [target].
   @protected
   void operator []=(String target, dynamic value) {
-    if (_properties[target] == value) return;
     _properties[target] = value;
     notifyListeners(target);
   }
 
-  @protected
-  void clear(String target, {dynamic fallback, bool silent = true}) {
-    _properties[target] = fallback;
-    if (!silent) {
-      notifyListeners(target);
-    }
-  }
-
-  /// Initialize `properties` with map
+  /// Initializes stored values from [props] without notifying listeners.
   @protected
   void fromMap(Map<String, dynamic> props) {
     for (var propertyName in props.keys.toList()) {
-      properties[propertyName] = props[propertyName];
+      _properties[propertyName] = props[propertyName];
     }
   }
 
@@ -102,21 +107,39 @@ class EnhancedChangeNotifier extends ChangeNotifier {
     for (String? property in targets) {
       String targetKey = property ?? 'All';
       if (once == true) {
-        _onceListeners.putIfAbsent(targetKey, () => []);
-        _onceListeners[targetKey]!.contains(listener)
-            ? null
-            : _onceListeners[targetKey]!.add(listener);
+        final listeners =
+            _onceListeners.putIfAbsent(targetKey, () => <Function>[]);
+        if (!listeners.any((f) => identical(f, listener))) {
+          listeners.add(listener);
+        }
+        // _onceListeners.putIfAbsent(targetKey, () => []);
+        // _onceListeners[targetKey]!.contains(listener)
+        //     ? null
+        //     : _onceListeners[targetKey]!.add(listener);
       } else {
-        _propertyListeners.putIfAbsent(targetKey, () => []);
-        if (targetKey == "All" &&
-            !_propertyListeners[targetKey]!.contains(listener)) {
-          if (listener is VoidCallback) {
+        final listeners =
+            _propertyListeners.putIfAbsent(targetKey, () => <Function>[]);
+
+        // Prevent adding the exact same function reference twice
+        if (!listeners.any((f) => identical(f, listener))) {
+          if (targetKey != "All") {
+            listeners.add(listener);
+          } else if (listener is VoidCallback) {
             super.addListener(listener);
           }
         }
-        _propertyListeners[targetKey]!.contains(listener)
-            ? null
-            : _propertyListeners[targetKey]!.add(listener);
+
+        // _propertyListeners.putIfAbsent(targetKey, () => []);
+        //
+        // if (targetKey == "All" &&
+        //     !_propertyListeners[targetKey]!.contains(listener)) {
+        //   if (listener is VoidCallback) {
+        //     super.addListener(listener);
+        //   }
+        // }
+        // _propertyListeners[targetKey]!.contains(listener)
+        //     ? null
+        //     : _propertyListeners[targetKey]!.add(listener);
       }
 
       if (immediate == true) {
@@ -203,6 +226,7 @@ class EnhancedChangeNotifier extends ChangeNotifier {
     }
   }
 
+  /// Validates and normalizes a listener target into a list of property names.
   List<String?>? _validate(Object? target) {
     if ((target is! String) && (target is! List<String>) && (target != null)) {
       print("invalid target type $target");

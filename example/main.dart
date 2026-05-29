@@ -1,21 +1,27 @@
 import 'package:enhanced_change_notifier/enhanced_change_notifier.dart';
+import 'package:enhanced_change_notifier/enhanced_latch_notifier.dart';
 import 'package:enhanced_change_notifier/signal.dart';
-import 'package:enhanced_change_notifier/src/enhanced_latch_notifier.dart';
 
 class AppModel extends EnhancedChangeNotifier {
-  String? get token => super.properties["token"];
-  set token(String? token) {
-    super.properties["token"] = token;
+  AppModel() {
+    super.fromMap(
+        {"token": "initial-token", "baseUrl": "url", "tasks": "tasks"});
   }
 
-  String? get baseUrl => super.properties["baseUrl"];
+  String? get token => this["token"];
+  set token(String? token) {
+    this["token"] = token;
+  }
+
+  String? get baseUrl => this["baseUrl"];
   set baseUrl(String? baseUrl) {
     super.properties["baseUrl"] = baseUrl;
   }
 
-  Map<String, dynamic> get tasks => super.properties["tasks"];
+  Map<String, dynamic> get tasks => this["tasks"];
   set tasks(Map<String, dynamic> tasks) {
-    super.properties["tasks"] = tasks;
+    super.fromMap({"tasks": tasks});
+    notifyListeners("tasks");
   }
 }
 
@@ -52,7 +58,10 @@ void main() {
       target: 'tasks',
       immediate: true);
 
-  // Assignment would automatically trigger listeners
+  // super.properties writes are useful for silent initialization.
+  print("initial token: ${appStateModel.getInstance().token}");
+
+  // Setters can trigger listeners with this[property] or explicit notifyListeners(property).
   appStateModel.getInstance().token = "fe3f6b58-684e-4063-ba3b-1b8f14981a8e";
   appStateModel.getInstance().baseUrl = "https://api.company.com";
   appStateModel.getInstance().tasks = {"task-for-example": 45};

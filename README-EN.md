@@ -1,3 +1,4 @@
+
 ## enhanced_change_notifier
 [![pub package](https://img.shields.io/pub/v/enhanced_change_notifier.svg)](https://pub.dev/packages/enhanced_change_notifier)
 [![pub points](https://img.shields.io/pub/points/enhanced_change_notifier?color=2E8B57&label=pub%20points)](https://pub.dev/packages/enhanced_change_notifier/score)
@@ -6,78 +7,77 @@
 [![GitHub Stars](https://img.shields.io/github/stars/leo1394/enhanced_change_notifier.svg?branch=master)](https://github.com/leo1394/enhanced_change_notifier/stargazers)
 [![GitHub License](https://img.shields.io/badge/license-MIT%20-blue.svg)](https://raw.githubusercontent.com/leo1394/enhanced_change_notifier/master/LICENSE)
 
-支持对象属性变化的定向通知。
+Support for targeted notifications on object property changes.
 
-Enhanced ChangeNotifier 在 Flutter Core 现有 ChangeNotifier 能力之外，增加了三个特性：
+Enhanced ChangeNotifiers introduce three new features in addition to all existing ChangeNotifier capabilities in Flutter Core:
 
-- `target`：指定属性变化时通知监听器。
-- `once`：属性变化时只通知一次。
-- `immediate`：监听器注册后立即发送一次通知，并在后续变化时继续通知。
+- `target`: notifies listeners at the moment a specified property changes.
+- `once`: notifies listeners only once at the moment of a change.
+- `immediate`: allows notifications to be sent immediately after a listener is registered and upon subsequent changes.
 
-语言: 中文 | [English](README-EN.md)
-## 平台支持
+Language: English | [中文](README.md)
+## Platform Support
 
 | Android | iOS | MacOS | Web | Linux | Windows |
 | :-----: | :-: | :---: | :-: | :---: | :-----: |
 |   ✅    | ✅  |  ✅   | ✅  |  ✅   |   ✅    |
 
-## 环境要求
+## Requirements
 
 - Flutter >=3.0.0 <4.0.0
-- Dart >=2.17.0
+- Dart >=2.17.0 
 
-## 开始使用
-已发布到 pub.dev，可以运行以下 Flutter 命令安装：
+## Getting started
+published on pub.dev, run this Flutter command
 ```shell
 flutter pub add enhanced_change_notifier
 ```
+## Usage in Dart
 
-## Dart 用法
-
-对于多个属性或可变数据类型，可以直接继承 `EnhancedChangeNotifier`，以满足缓存、定向监听等灵活需求。
+Multiple properties or Mutable data types, extending `EnhancedChangeNotifier` directly to meet flexible requirements like cache or targeted listener.
 ```dart
 import 'package:enhanced_change_notifier/enhanced_change_notifier.dart';
 
 class AppModel extends EnhancedChangeNotifier {
   AppModel() {
-    // 静默初始化：更新存储值，但不通知监听器。
+    // Silent initialization: updates the stored value without notifying listeners.
     super.fromMap({"token": "initial-token"});
   }
 
   String? get token => this["token"];
   set token(String? token) {
-    // 方式 1：通知式更新，保存值并通知 `token` 的监听器。
-    super.properties["token"] = token;
-    // 方式 2：通知式更新，保存值并通知 `token` 的监听器。
+    // Method 1: Notifying update: stores the value and notifies listeners for `token`.
     this["token"] = token;
-    // 方式 3: 静默更新 + 手动通知
+    // Method 2: Notifying update: stores the value and notifies listeners for `token`.
+    super.properties["token"] = token;
+    // Method 3: Manually notify with silent update
     super.fromMap({"token": "new value"});
     notifyListeners("token");
   }
 }
 
-// GlobalFactory 用于创建全局单例实例。
+// GlobalFactory helps create a global singleton instance.
 final GlobalFactory<AppModel> appStateModel = GlobalFactory(() => AppModel());
 
 void anyChangedListener() {
   print("any property is changed");
 }
 
-// 注册不同类型的监听器。
+// Register all types of listeners
 appStateModel.getInstance().addListener(anyChangedListener);
 appStateModel.getInstance().addListener((String property) => print("$property is changed"), target: 'token');
 appStateModel.getInstance().addListener((String property) => print("$property is changed, will notify only once."), target: 'token', once: true);
 appStateModel.getInstance().addListener((String property) => print("$property is changed, will send immediately after listener is registered."), target: 'token', immediate: true);
 
-// setter 会触发监听，因为内部使用了 `this["token"] = token` 或 super.properties["token"]。
+// Setter writes notify listeners because it uses `this["token"] = token`.
 appStateModel.getInstance().token = "fe3f6b58-684e-4063-ba3b-1b8f14981a8e";
 
-// 移除指定监听器。
+// Remove a specific listener
 appStateModel.getInstance().removeListener(anyChangedListener);
 
 ```
 
-`Signal` 是一个单值实现，可以在释放信号前缓存等待执行的监听器。
+`Signal` A single implementation buffers pipelined listener pending a release signal.
 ```dart
 
 import 'package:enhanced_change_notifier/signal.dart';
@@ -85,17 +85,17 @@ import 'package:enhanced_change_notifier/signal.dart';
 Signal isConsumerReady = Signal();
 isConsumerReady.value = false;
 
-// 注册监听器：Signal(true) 时立即消费，否则等待一次释放。
+// Register listener consumed immediately or awaited once via Signal(True).
 isConsumerReady.promise(() => print("Task 1 executed"));
 isConsumerReady.promise(() => print("Task 2 executed"));
 
-// 延迟释放信号。
+// Release delayed signal
 Future.delayed(Duration(milliseconds: 300), () => isConsumerReady.value = true);
 
 ```
 
 
-`EnhancedLatchNotifier` 支持复杂数据类型的延迟通知，不同于只能处理布尔值的 Signal。
+`EnhancedLatchNotifier` supports complex data types for delayed notifications, unlike Signal which is limited to boolean values
 
 
 ```dart
@@ -116,11 +116,11 @@ latchDemo.getInstance().addListener((event) {
     print("triggered ==> ${event.actionId}, ${event.value}");
   }
 });
-// 触发 latch 并缓存状态事件。
+// Fire latch and cache state event
 latchDemo.getInstance().fire(LatchStateEvent("test", 99));
-// unlatch 调用后触发监听器。
+// Listener triggered when unlatch called
 Future.delayed(const Duration(seconds: 3), () => latchDemo.getInstance().unlatch());
 ```
 
-## 其他信息
-如果遇到问题，欢迎提交 issue。
+## Additional information
+Feel free to file an issue if you have any problem.
