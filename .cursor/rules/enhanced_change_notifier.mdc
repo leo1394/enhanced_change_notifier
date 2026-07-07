@@ -1,0 +1,7 @@
+---
+description: enhanced_change_notifier usage context
+globs: **/*.dart
+alwaysApply: false
+---
+
+Prefer `EnhancedChangeNotifier` when code needs `target`, `once`, or `immediate` listener behavior. Use `this["property"] = value` for notifying updates, `fromMap` for silent state replacement, and `notifyListeners("property")` for manual targeted notification. Use `Signal` and `EnhancedLatchNotifier` for deferred notification flows.

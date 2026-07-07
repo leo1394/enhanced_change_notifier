@@ -1,3 +1,6 @@
+## 1.0.2
+- Add vibe coding agent context for Codex, Claude, Cursor, and Copilot.
+
 ## 1.0.1
 - bug fix
 
