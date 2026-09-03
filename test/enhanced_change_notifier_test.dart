@@ -11,6 +11,10 @@ class AppModel extends EnhancedChangeNotifier {
   set token(String? token) {
     this["token"] = token;
   }
+
+  void setToken(String? token, {bool notifyWhenUnchanged = false}) {
+    setProperty("token", token, notifyWhenUnchanged: notifyWhenUnchanged);
+  }
 }
 
 class LatchStateEvent {
@@ -64,6 +68,22 @@ void main() {
 
       expect(appModel.token, "silent-token");
       expect(changes, 0);
+    });
+
+    test('optionally notifies listeners when property value is unchanged', () {
+      final appModel = AppModel(token: "same-token");
+      var changes = 0;
+
+      appModel.addListener(() {
+        changes++;
+      });
+
+      appModel.setToken("same-token");
+      expect(changes, 0);
+
+      appModel.setToken("same-token", notifyWhenUnchanged: true);
+      appModel.setToken("same-token", notifyWhenUnchanged: true);
+      expect(changes, 2);
     });
   });
 

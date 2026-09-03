@@ -1,3 +1,6 @@
+## 1.0.3
+- Feature #1: Introduce `notifyWhenUnchanged` optional params.
+
 ## 1.0.2
 - Add vibe coding agent context for Codex, Claude, Cursor, and Copilot.
 

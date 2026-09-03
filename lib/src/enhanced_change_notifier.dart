@@ -47,6 +47,17 @@ class EnhancedChangeNotifier extends ChangeNotifier {
     notifyListeners(target);
   }
 
+  /// Stores [value] for [target] and optionally notifies when unchanged.
+  @protected
+  void setProperty(String target, dynamic value,
+      {bool notifyWhenUnchanged = false}) {
+    if (!notifyWhenUnchanged && _properties[target] == value) {
+      return;
+    }
+    _properties[target] = value;
+    notifyListeners(target);
+  }
+
   /// Initializes stored values from [props] without notifying listeners.
   @protected
   void fromMap(Map<String, dynamic> props) {
